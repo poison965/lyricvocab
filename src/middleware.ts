@@ -32,14 +32,9 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Check if user is trying to access protected route
-  if (request.nextUrl.pathname.startsWith('/vocabulary')) {
-    if (!user) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/login'
-      return NextResponse.redirect(url)
-    }
-  }
+  // Note: We removed the server-side redirect for /vocabulary
+  // The client-side page will handle login check to avoid page flicker
+  // Client handles: show login prompt or redirect without full page reload
 
   // Check if user is already logged in and trying to access auth pages
   if (request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/register')) {

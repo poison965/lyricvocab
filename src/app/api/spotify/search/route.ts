@@ -35,6 +35,8 @@ export async function GET(request: Request) {
       // 更换 100 为 600 获取更高清的图片
       image: item.artworkUrl100?.replace('100x100', '600x600') || '',
       duration: item.trackTimeMillis || 0,
+      // 添加音频预览链接
+      previewUrl: item.previewUrl || null,
     }))
 
     return NextResponse.json({ tracks })

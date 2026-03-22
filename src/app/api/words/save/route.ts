@@ -30,11 +30,10 @@ export async function POST(request: Request) {
       }
     )
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    // Try to get user from cookie first
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    if (!user) {
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized', status: 401 })
     }
 
@@ -57,6 +56,7 @@ export async function POST(request: Request) {
       if (error.code === '23505') {
         return NextResponse.json({ error: '单词已存在', status: 409 })
       }
+      console.error('Database error:', error)
       return NextResponse.json({ error: error.message, status: 500 })
     }
 

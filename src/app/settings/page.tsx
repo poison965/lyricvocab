@@ -10,19 +10,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/lib/supabase'
 
 const interestAreas = [
-  { id: 'general', name: '通用', description: '日常生活和工作中常用词汇' },
-  { id: 'finance', name: '金融', description: '金融、投资、银行相关词汇' },
-  { id: 'medical', name: '医学', description: '医学、健康、护理相关词汇' },
-  { id: 'technology', name: '科技', description: '科技、互联网、编程相关词汇' },
-  { id: 'law', name: '法律', description: '法律、法规、合同相关词汇' },
-  { id: 'arts', name: '艺术', description: '戏剧、音乐、文学相关词汇' },
+  { id: 'general', name: '通用', description: '日常生活和工作词汇' },
+  { id: 'finance', name: '金融', description: '金融、投资、银行' },
+  { id: 'medical', name: '医学', description: '医学、健康、护理' },
+  { id: 'technology', name: '科技', description: '科技、互联网、编程' },
+  { id: 'law', name: '法律', description: '法律、法规、合同' },
+  { id: 'arts', name: '艺术', description: '戏剧、音乐、文学' },
 ]
 
 const vocabularyLevels = [
-  { id: 'beginner', name: '初级', description: '高频常用词汇（约1000词）' },
-  { id: 'cet4', name: 'CET-4', description: '大学英语四级词汇（约4500词）' },
-  { id: 'cet6', name: 'CET-6', description: '大学英语六级词汇（约6000词）' },
-  { id: 'kaoyan', name: '考研', description: '考研英语词汇（约5500词）' },
+  { id: 'cet4', name: 'CET-4 / 四级', description: '大学英语四级 (~4500词)' },
+  { id: 'cet6', name: 'CET-6 / 六级', description: '大学英语六级 (~6000词)' },
+  { id: 'kaoyan', name: '考研', description: '研究生入学考试 (~5500词)' },
+  { id: 'tem4', name: 'TEM-4 / 专四', description: '英语专业四级 (~8000词)' },
+  { id: 'tem8', name: 'TEM-8 / 专八', description: '英语专业八级 (~13000词)' },
+  { id: 'ielts', name: 'IELTS / 雅思', description: '雅思词汇 (~7000词)' },
+  { id: 'toefl', name: 'TOEFL / 托福', description: '托福词汇 (~8000词)' },
+  { id: 'gre', name: 'GRE', description: 'GRE词汇 (~20000词)' },
 ]
 
 export default function SettingsPage() {
@@ -41,11 +45,30 @@ export default function SettingsPage() {
         return
       }
       setUser(session.user)
-      // Load user preferences from localStorage (simplified for now)
+
+      const onboardingLevel = localStorage.getItem('user_vocabulary_level')
+      const onboardingInterests = localStorage.getItem('user_interests')
       const savedLevel = localStorage.getItem('userLevel')
       const savedInterest = localStorage.getItem('userInterest')
-      if (savedLevel) setUserLevel(savedLevel)
-      if (savedInterest) setUserInterest(savedInterest)
+
+      if (onboardingLevel) setUserLevel(onboardingLevel)
+      else if (savedLevel) setUserLevel(savedLevel)
+
+      if (onboardingInterests) {
+        try {
+          const interests = JSON.parse(onboardingInterests)
+          if (interests.includes('daily') || interests.includes('love')) setUserInterest('general')
+          if (interests.includes('finance')) setUserInterest('finance')
+          if (interests.includes('medical')) setUserInterest('medical')
+          if (interests.includes('tech')) setUserInterest('technology')
+          if (interests.includes('art')) setUserInterest('arts')
+        } catch {
+          // ignore parse errors
+        }
+      } else if (savedInterest) {
+        setUserInterest(savedInterest)
+      }
+
       setLoading(false)
     })
 
@@ -61,15 +84,17 @@ export default function SettingsPage() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    router.push('/search')
-    router.refresh()
+    router.push('/login')
   }
 
   const handleSavePreferences = async () => {
     setSaving(true)
     localStorage.setItem('userLevel', userLevel)
     localStorage.setItem('userInterest', userInterest)
-    // Simulate save delay
+
+    // Also update the onboarding level format
+    localStorage.setItem('user_vocabulary_level', userLevel)
+
     await new Promise(resolve => setTimeout(resolve, 500))
     setSaving(false)
     setSaved(true)
@@ -78,25 +103,25 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-[#121212] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1DB954]" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-[#121212]">
       {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
+      <header className="bg-black/50 backdrop-blur-sm border-b border-white/10 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/search">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
                 <ArrowLeft className="w-5 h-5" />
               </Button>
             </Link>
-            <h1 className="text-xl font-bold text-blue-600 flex items-center gap-2">
-              <SettingsIcon className="w-6 h-6" />
+            <h1 className="text-xl font-bold text-white flex items-center gap-2">
+              <SettingsIcon className="w-6 h-6 text-[#1DB954]" />
               设置
             </h1>
           </div>
@@ -105,9 +130,9 @@ export default function SettingsPage() {
 
       <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
         {/* User Info Card */}
-        <Card>
+        <Card className="bg-[#181818] border-white/10">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-white">
               <User className="w-5 h-5" />
               个人资料
             </CardTitle>
@@ -115,10 +140,10 @@ export default function SettingsPage() {
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">{user?.email}</p>
+                <p className="font-medium text-white">{user?.email}</p>
                 <p className="text-sm text-gray-500">已验证邮箱</p>
               </div>
-              <Button variant="outline" onClick={handleLogout}>
+              <Button variant="outline" onClick={handleLogout} className="border-white/20 text-white hover:bg-white/10">
                 <LogOut className="w-4 h-4 mr-2" />
                 退出登录
               </Button>
@@ -127,25 +152,27 @@ export default function SettingsPage() {
         </Card>
 
         {/* Vocabulary Level */}
-        <Card>
+        <Card className="bg-[#181818] border-white/10">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-white">
               <BookOpen className="w-5 h-5" />
-              词汇水平
+              词汇等级
             </CardTitle>
-            <CardDescription>选择你的英语水平，系统会自动过滤已掌握的简单词汇</CardDescription>
+            <CardDescription className="text-gray-400">
+              选择您的英语水平，系统将自动过滤您已掌握的简单词汇
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Select value={userLevel} onValueChange={(value) => value && setUserLevel(value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="选择词汇水平" />
+              <SelectTrigger className="w-full bg-[#282828] border-white/10 text-white">
+                <SelectValue placeholder="选择词汇等级" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-[#282828] border-white/10">
                 {vocabularyLevels.map((level) => (
-                  <SelectItem key={level.id} value={level.id}>
+                  <SelectItem key={level.id} value={level.id} className="text-white">
                     <div>
                       <p className="font-medium">{level.name}</p>
-                      <p className="text-xs text-gray-500">{level.description}</p>
+                      <p className="text-xs text-gray-400">{level.description}</p>
                     </div>
                   </SelectItem>
                 ))}
@@ -155,41 +182,47 @@ export default function SettingsPage() {
         </Card>
 
         {/* Interest Area */}
-        <Card>
+        <Card className="bg-[#181818] border-white/10">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-white">
               <SettingsIcon className="w-5 h-5" />
               兴趣领域
             </CardTitle>
-            <CardDescription>选择你感兴趣的领域，重点学习相关词汇</CardDescription>
+            <CardDescription className="text-gray-400">
+              选择您的兴趣领域，优先展示相关词汇
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Select value={userInterest} onValueChange={(value) => value && setUserInterest(value)}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full bg-[#282828] border-white/10 text-white">
                 <SelectValue placeholder="选择兴趣领域" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-[#282828] border-white/10">
                 {interestAreas.map((area) => (
-                  <SelectItem key={area.id} value={area.id}>
+                  <SelectItem key={area.id} value={area.id} className="text-white">
                     <div className="text-left">
                       <p className="font-medium">{area.name}</p>
-                      <p className="text-xs text-gray-500">{area.description}</p>
+                      <p className="text-xs text-gray-400">{area.description}</p>
                     </div>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-sm text-gray-500 mt-3">
-              提示：兴趣领域功能可以帮助你优先学习特定主题的词汇。后续版本将支持自动从歌词中提取领域相关词汇。
-            </p>
           </CardContent>
         </Card>
 
         {/* Save Button */}
         <div className="flex justify-end gap-4">
-          <Button onClick={handleSavePreferences} disabled={saving} className="min-w-32">
+          <Button
+            onClick={handleSavePreferences}
+            disabled={saving}
+            className="min-w-32 bg-[#1DB954] hover:bg-[#1ed760] text-black font-semibold"
+          >
             {saving ? '保存中...' : saved ? (
-              <><Check className="w-4 h-4 mr-2" />已保存</>
+              <>
+                <Check className="w-4 h-4 mr-2" />
+                已保存
+              </>
             ) : '保存设置'}
           </Button>
         </div>

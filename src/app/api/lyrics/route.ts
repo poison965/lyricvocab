@@ -1,5 +1,43 @@
 import { NextResponse } from 'next/server'
 
+// Interface for parsed lyric lines with timestamps
+interface LyricLine {
+  time: number // timestamp in seconds
+  text: string
+  endTime?: number // end time (calculated from next line)
+}
+
+// Parse synced lyrics into structured data
+function parseSyncedLyrics(syncedLyrics: string): LyricLine[] {
+  const lines: LyricLine[] = []
+  const regex = /\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)/g
+  let match
+
+  while ((match = regex.exec(syncedLyrics)) !== null) {
+    const minutes = parseInt(match[1], 10)
+    const seconds = parseInt(match[2], 10)
+    const milliseconds = parseInt(match[3].padEnd(3, '0'), 10)
+    const time = minutes * 60 + seconds + milliseconds / 1000
+    const text = match[4].trim()
+
+    if (text) {
+      lines.push({ time, text })
+    }
+  }
+
+  // Calculate end times (start time of next line)
+  for (let i = 0; i < lines.length - 1; i++) {
+    lines[i].endTime = lines[i + 1].time
+  }
+
+  // Last line gets a default 5 second duration
+  if (lines.length > 0) {
+    lines[lines.length - 1].endTime = lines[lines.length - 1].time + 5
+  }
+
+  return lines
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const artist = searchParams.get('artist')
@@ -18,7 +56,10 @@ export async function GET(request: Request) {
     if (lrclibResponse.ok) {
       const data = await lrclibResponse.json()
       if (data.syncedLyrics) {
-        // Remove timestamps from synced lyrics
+        // Parse timestamps
+        const syncedLines = parseSyncedLyrics(data.syncedLyrics)
+
+        // Remove timestamps from synced lyrics for clean text
         const cleanLyrics = data.syncedLyrics
           .replace(/\[\d{2}:\d{2}\.\d{2,3}\]/g, '')
           .replace(/\[\d{2}:\d{2}\.\d{2,3}\n/g, '')
@@ -27,11 +68,15 @@ export async function GET(request: Request) {
         return NextResponse.json({
           lyrics: cleanLyrics,
           source: 'exact',
+          hasTimestamps: true,
+          timestamps: syncedLines,
         })
       } else if (data.plainLyrics) {
         return NextResponse.json({
           lyrics: data.plainLyrics,
           source: 'search',
+          hasTimestamps: false,
+          timestamps: [],
         })
       }
     }
@@ -44,6 +89,9 @@ export async function GET(request: Request) {
     if (searchResponse.ok) {
       const results = await searchResponse.json()
       if (results.length > 0 && results[0].syncedLyrics) {
+        // Parse timestamps
+        const syncedLines = parseSyncedLyrics(results[0].syncedLyrics)
+
         const cleanLyrics = results[0].syncedLyrics
           .replace(/\[\d{2}:\d{2}\.\d{2,3}\]/g, '')
           .replace(/\[\d{2}:\d{2}\.\d{2,3}\n/g, '')
@@ -52,6 +100,8 @@ export async function GET(request: Request) {
         return NextResponse.json({
           lyrics: cleanLyrics,
           source: 'search',
+          hasTimestamps: true,
+          timestamps: syncedLines,
         })
       }
     }
@@ -78,6 +128,8 @@ Together we will stay
 Forever and always
 Until our dying day`,
       source: 'mock',
+      hasTimestamps: false,
+      timestamps: [],
     })
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch lyrics', status: 500 })

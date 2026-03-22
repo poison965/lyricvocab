@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Music } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,121 +15,121 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser(session.user)
+        const userLevel = localStorage.getItem('user_vocabulary_level')
+        if (userLevel) {
+          router.push('/search')
+        } else {
+          router.push('/onboarding')
+        }
+      }
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser(session.user)
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    if (!supabase) {
-      setError('请配置 Supabase 后再试')
-      setLoading(false)
-      return
-    }
-
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (error) {
-        setError(error.message)
-      } else {
-        router.push('/search')
-        router.refresh()
+      if (signInError) {
+        setError(signInError.message)
+      } else if (data.user) {
+        const userLevel = localStorage.getItem('user_vocabulary_level')
+        if (userLevel) {
+          router.push('/search')
+        } else {
+          router.push('/onboarding')
+        }
       }
     } catch (err) {
-      setError('An unexpected error occurred')
+      setError('Login failed, please try again')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleGithubLogin = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: `${location.origin}/auth/callback`,
-        },
-      })
-      if (error) {
-        setError(error.message)
-      }
-    } catch (err) {
-      setError('Failed to sign in with GitHub')
-    }
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">LyricVocab</CardTitle>
-          <CardDescription>登录到您的单词本</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
-                邮箱
-              </label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
-                密码
-              </label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            {error && (
-              <p className="text-sm text-red-500 text-center">{error}</p>
-            )}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? '登录中...' : '登录'}
-            </Button>
-          </form>
+    <div className="min-h-screen flex items-center justify-center bg-[#121212] p-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <Link href="/search" className="inline-flex items-center gap-2">
+            <Music className="w-8 h-8 text-[#1DB954]" />
+            <span className="text-2xl font-bold text-white">LyricVocab</span>
+          </Link>
+        </div>
 
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">或</span>
-            </div>
-          </div>
+        <Card className="bg-[#181818] border-white/10">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-white">Welcome Back</CardTitle>
+            <CardDescription className="text-gray-400">Login to continue learning</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm font-medium text-gray-300">
+                  Email
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="bg-[#282828] border-white/10 text-white placeholder:text-gray-500 focus:border-[#1DB954] focus:ring-[#1DB954]"
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-sm font-medium text-gray-300">
+                  Password
+                </label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="bg-[#282828] border-white/10 text-white placeholder:text-gray-500 focus:border-[#1DB954] focus:ring-[#1DB954]"
+                />
+              </div>
+              {error && (
+                <p className="text-sm text-red-400 text-center">{error}</p>
+              )}
+              <Button type="submit" disabled={loading} className="w-full bg-[#1DB954] hover:bg-[#1ed760] text-black font-semibold">
+                {loading ? 'Logging in...' : 'Login'}
+              </Button>
+            </form>
 
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handleGithubLogin}
-          >
-            使用 GitHub 登录
-          </Button>
-
-          <p className="text-center text-sm text-gray-600 mt-6">
-            还没有账号?{' '}
-            <Link href="/register" className="text-blue-600 hover:underline">
-              注册
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
+            <p className="text-center text-sm text-gray-400 mt-6">
+              Don't have an account?{' '}
+              <Link href="/register" className="text-[#1DB954] hover:underline">
+                Sign Up
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
