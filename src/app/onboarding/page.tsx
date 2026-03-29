@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Music, ArrowRight, ArrowLeft, Sparkles, BookOpen, LogOut, User, Settings, SkipForward, Trophy, Target, Star } from 'lucide-react'
+import { Music, BookOpen, LogOut, Settings } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 // 词汇量测试题 - 按难度分级
@@ -398,22 +398,22 @@ export default function OnboardingPage() {
 
   // Header component
   const Header = () => (
-    <header className="bg-black/50 backdrop-blur-sm border-b border-white/10 sticky top-0 z-10">
-      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-white flex items-center gap-2">
-          <Music className="w-6 h-6 text-[#1DB954]" />
+    <header className="bg-black/60 backdrop-blur-xl nav-glow sticky top-0 z-10">
+      <div className="max-w-[1400px] mx-auto px-8 py-4 flex items-center justify-between">
+        <h1 className="font-headline text-xl font-bold text-white flex items-center gap-2">
+          <span className="material-symbols-outlined text-[#72fe8f]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>music_note</span>
           LyricVocab
         </h1>
         <nav className="flex items-center gap-4">
-          <Link href="/search" className="text-gray-400 hover:text-white transition-colors">搜索</Link>
+          <Link href="/search" className="text-[#adaaaa] hover:text-white transition-colors">搜索</Link>
           {user && (
             <div className="flex items-center gap-3">
-              <Link href="/settings" className="text-gray-400 hover:text-white flex items-center gap-1">
-                <Settings className="w-4 h-4" />
+              <Link href="/settings" className="text-[#adaaaa] hover:text-white flex items-center gap-1">
+                <span className="material-symbols-outlined text-lg">settings</span>
                 {user.email?.split('@')[0]}
               </Link>
-              <button onClick={handleLogout} className="text-gray-400 hover:text-white flex items-center gap-1">
-                <LogOut className="w-4 h-4" />
+              <button onClick={handleLogout} className="text-[#adaaaa] hover:text-white flex items-center gap-1">
+                <span className="material-symbols-outlined text-lg">logout</span>
                 退出
               </button>
             </div>
@@ -431,50 +431,50 @@ export default function OnboardingPage() {
     const isSkipped = skipped[currentQuestion]
 
     const difficultyLabel = difficultyLabels[question.difficulty]
-    const difficultyColor = question.difficulty <= 2 ? 'text-green-500' : question.difficulty <= 3 ? 'text-yellow-500' : 'text-orange-500'
+    const difficultyColor = question.difficulty <= 2 ? 'text-[#72fe8f]' : question.difficulty <= 3 ? 'text-yellow-400' : 'text-orange-400'
 
     return (
-      <div className="min-h-screen bg-[#121212]">
+      <div className="min-h-screen bg-[#0e0e0e]">
         <Header />
-        <div className="max-w-xl mx-auto px-4 py-12">
+        <div className="max-w-xl mx-auto px-8 py-12">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-[#1DB954]/20 rounded-full mb-4">
-              <Sparkles className="w-8 h-8 text-[#1DB954]" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-[#72fe8f]/20 rounded-full mb-4">
+              <span className="material-symbols-outlined text-[#72fe8f] text-4xl" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>auto_awesome</span>
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">词汇量水平测试</h1>
-            <p className="text-gray-400">请选择最准确的中文含义</p>
+            <h1 className="font-headline text-2xl font-bold text-white mb-2">词汇量水平测试</h1>
+            <p className="text-[#adaaaa]">请选择最准确的中文含义</p>
           </div>
 
           {/* Progress bar */}
           <div className="mb-8">
-            <div className="flex justify-between text-sm text-gray-500 mb-2">
+            <div className="flex justify-between text-sm text-[#adaaaa] mb-2">
               <span>第 {currentQuestion + 1} 题 / 共 {questions.length} 题</span>
               <span className={difficultyColor}>{difficultyLabel}</span>
             </div>
-            <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-              <div className="h-full bg-[#1DB954] transition-all duration-300" style={{ width: `${progress}%` }} />
+            <div className="w-full h-1 bg-[#262626] rounded-full overflow-hidden">
+              <div className="h-full bg-[#72fe8f] transition-all duration-300" style={{ width: `${progress}%` }} />
             </div>
           </div>
 
           {/* Question card */}
-          <Card className="bg-[#181818] border-white/10 mb-6">
+          <Card className="bg-[#1a1a1a] border-[#484847]/10 rounded-2xl mb-6">
             <CardHeader className="text-center pb-2">
-              <CardTitle className="text-5xl font-bold text-white mb-2">{question.word}</CardTitle>
-              <CardDescription className="text-gray-400">选择正确的中文释义</CardDescription>
+              <CardTitle className="font-headline text-5xl font-extrabold text-white mb-2">{question.word}</CardTitle>
+              <CardDescription className="text-[#adaaaa]">选择正确的中文释义</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {options.map((option, index) => (
                 <Button
                   key={index}
                   variant={currentAnswer === option ? 'default' : 'outline'}
-                  className={`w-full h-auto min-h-[3.5rem] text-left px-4 py-3 text-base justify-start whitespace-normal ${
+                  className={`w-full h-auto min-h-[3.5rem] text-left px-4 py-3 text-base justify-start whitespace-normal rounded-xl ${
                     currentAnswer === option
-                      ? 'bg-[#1DB954] hover:bg-[#1ed760] text-black border-[#1DB954]'
-                      : 'border-white/20 text-gray-300 hover:bg-white/10 hover:border-white/40'
+                      ? 'bg-gradient-to-br from-[#72fe8f] to-[#1cb853] hover:scale-105 active:scale-95 transition-all text-[#005f26] border-[#72fe8f]'
+                      : 'border-[#484847]/30 text-[#adaaaa] hover:bg-[#262626] hover:border-[#484847]/60'
                   }`}
                   onClick={() => handleAnswer(option)}
                 >
-                  <span className="mr-3 font-bold opacity-60">
+                  <span className="mr-3 font-bold opacity-60 font-headline">
                     {String.fromCharCode(65 + index)}.
                   </span>
                   {option}
@@ -489,27 +489,27 @@ export default function OnboardingPage() {
               variant="outline"
               onClick={handlePrev}
               disabled={currentQuestion === 0}
-              className="border-white/20 text-white hover:bg-white/10"
+              className="border-[#484847]/30 text-[#adaaaa] hover:bg-[#262626] hover:text-white rounded-xl"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <span className="material-symbols-outlined mr-2">arrow_back</span>
               上一题
             </Button>
             <div className="flex gap-2">
               <Button
                 variant="outline"
                 onClick={handleSkip}
-                className="border-white/20 text-gray-400 hover:bg-white/10"
+                className="border-[#484847]/30 text-[#484847] hover:bg-[#262626] hover:text-[#adaaaa] rounded-xl"
               >
-                <SkipForward className="w-4 h-4 mr-2" />
+                <span className="material-symbols-outlined mr-2">skip_next</span>
                 跳过
               </Button>
               <Button
                 onClick={handleNext}
                 disabled={currentAnswer === null && !isSkipped}
-                className="bg-[#1DB954] hover:bg-[#1ed760] text-black font-semibold"
+                className="bg-gradient-to-br from-[#72fe8f] to-[#1cb853] text-[#005f26] font-bold hover:scale-105 active:scale-95 transition-all rounded-full"
               >
                 {currentQuestion === questions.length - 1 ? '查看结果' : '下一题'}
-                {currentQuestion < questions.length - 1 && <ArrowRight className="w-4 h-4 ml-2" />}
+                {currentQuestion < questions.length - 1 && <span className="material-symbols-outlined ml-2">arrow_forward</span>}
               </Button>
             </div>
           </div>
@@ -529,63 +529,63 @@ export default function OnboardingPage() {
     }
 
     return (
-      <div className="min-h-screen bg-[#121212]">
+      <div className="min-h-screen bg-[#0e0e0e]">
         <Header />
-        <div className="max-w-xl mx-auto px-4 py-12">
+        <div className="max-w-xl mx-auto px-8 py-12">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-[#1DB954]/20 rounded-full mb-4">
-              <Trophy className="w-10 h-10 text-[#1DB954]" />
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-[#72fe8f]/20 rounded-full mb-4">
+              <span className="material-symbols-outlined text-[#72fe8f] text-5xl" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>emoji_events</span>
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">测试完成!</h1>
-            <p className="text-gray-400">以下是您的评估结果</p>
+            <h1 className="font-headline text-3xl font-bold text-white mb-2">测试完成!</h1>
+            <p className="text-[#adaaaa]">以下是您的评估结果</p>
           </div>
 
           {/* Result cards */}
           <div className="space-y-4 mb-8">
-            <Card className="bg-[#181818] border-white/10">
+            <Card className="bg-[#1a1a1a] border-[#484847]/10 rounded-2xl">
               <CardContent className="p-6 text-center">
-                <div className="text-5xl font-bold text-[#1DB954] mb-2">
+                <div className="font-headline text-5xl font-extrabold text-[#72fe8f] mb-2">
                   {testResult.estimatedVocabulary || 3500}
                 </div>
-                <div className="text-gray-400">预估词汇量 (词)</div>
+                <div className="text-[#adaaaa]">预估词汇量 (词)</div>
               </CardContent>
             </Card>
 
             <div className="grid grid-cols-2 gap-4">
-              <Card className="bg-[#181818] border-white/10">
+              <Card className="bg-[#1a1a1a] border-[#484847]/10 rounded-2xl">
                 <CardContent className="p-4 text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <Target className="w-5 h-5 text-[#1DB954]" />
-                    <span className="text-gray-400 text-sm">正确率</span>
+                    <span className="material-symbols-outlined text-[#72fe8f] text-lg" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>gps_fixed</span>
+                    <span className="text-[#adaaaa] text-sm">正确率</span>
                   </div>
-                  <div className="text-2xl font-bold text-white">
+                  <div className="font-headline text-2xl font-bold text-white">
                     {testResult.correct}/{testResult.total}
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#181818] border-white/10">
+              <Card className="bg-[#1a1a1a] border-[#484847]/10 rounded-2xl">
                 <CardContent className="p-4 text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
-                    <Star className="w-5 h-5 text-yellow-500" />
-                    <span className="text-gray-400 text-sm">难度等级</span>
+                    <span className="material-symbols-outlined text-yellow-400 text-lg" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>star</span>
+                    <span className="text-[#adaaaa] text-sm">难度等级</span>
                   </div>
-                  <div className="text-lg font-bold text-white">
+                  <div className="font-headline text-lg font-bold text-white">
                     {levelLabels[testResult.recommendedLevel] || 'CET-4'}
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            <Card className="bg-[#1DB954]/10 border-[#1DB954]/30">
+            <Card className="bg-[#72fe8f]/10 border-[#72fe8f]/30 rounded-2xl">
               <CardContent className="p-4">
                 <div className="text-center">
-                  <p className="text-white font-medium mb-2">推荐设置</p>
-                  <p className="text-gray-300 text-sm">
-                    建议选择: <span className="text-[#1DB954] font-bold">{levelLabels[testResult.recommendedLevel] || 'CET-4'}</span>
+                  <p className="text-white font-headline font-medium mb-2">推荐设置</p>
+                  <p className="text-[#adaaaa] text-sm">
+                    建议选择: <span className="text-[#72fe8f] font-bold">{levelLabels[testResult.recommendedLevel] || 'CET-4'}</span>
                   </p>
-                  <p className="text-gray-300 text-sm">
-                    建议难度: <span className="text-[#1DB954] font-bold">
+                  <p className="text-[#adaaaa] text-sm">
+                    建议难度: <span className="text-[#72fe8f] font-bold">
                       {testResult.recommendedSlider === 1 ? '入门' :
                        testResult.recommendedSlider === 2 ? '基础' :
                        testResult.recommendedSlider === 3 ? '中级' :
@@ -601,15 +601,15 @@ export default function OnboardingPage() {
           <div className="flex flex-col gap-3">
             <Button
               onClick={() => setStep('interests')}
-              className="w-full h-14 text-lg bg-[#1DB954] hover:bg-[#1ed760] text-black font-semibold"
+              className="w-full h-14 text-lg bg-gradient-to-br from-[#72fe8f] to-[#1cb853] text-[#005f26] font-bold hover:scale-105 active:scale-95 transition-all rounded-full"
             >
               开始学习
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <span className="material-symbols-outlined ml-2">arrow_forward</span>
             </Button>
             <Button
               variant="outline"
               onClick={handleRetry}
-              className="w-full border-white/20 text-white hover:bg-white/10"
+              className="w-full border-[#484847]/30 text-[#adaaaa] hover:bg-[#262626] hover:text-white rounded-xl"
             >
               重新测试
             </Button>
@@ -622,37 +622,37 @@ export default function OnboardingPage() {
   // Interests phase
   if (step === 'interests') {
     return (
-      <div className="min-h-screen bg-[#121212]">
+      <div className="min-h-screen bg-[#0e0e0e]">
         <Header />
-        <div className="max-w-xl mx-auto px-4 py-12">
+        <div className="max-w-xl mx-auto px-8 py-12">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-[#1DB954]/20 rounded-full mb-4">
-              <BookOpen className="w-8 h-8 text-[#1DB954]" />
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-[#72fe8f]/20 rounded-full mb-4">
+              <span className="material-symbols-outlined text-[#72fe8f] text-4xl" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>menu_book</span>
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">选择您的兴趣领域</h1>
-            <p className="text-gray-400">根据您的选择推荐更相关的词汇</p>
+            <h1 className="font-headline text-2xl font-bold text-white mb-2">选择您的兴趣领域</h1>
+            <p className="text-[#adaaaa]">根据您的选择推荐更相关的词汇</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
             {interestDomains.map((domain) => (
               <Card
                 key={domain.id}
-                className={`cursor-pointer transition-all hover:bg-white/5 ${
+                className={`cursor-pointer transition-all hover:bg-[#262626] ${
                   selectedInterests.includes(domain.id)
-                    ? 'bg-[#1DB954]/10 border-[#1DB954]'
-                    : 'bg-[#181818] border-white/10'
-                }`}
+                    ? 'bg-[#72fe8f]/10 border-[#72fe8f]'
+                    : 'bg-[#1a1a1a] border-[#484847]/10'
+                } rounded-2xl`}
                 onClick={() => handleInterestToggle(domain.id)}
               >
                 <CardContent className="p-4 flex items-center gap-3">
                   <Checkbox
                     checked={selectedInterests.includes(domain.id)}
                     onCheckedChange={() => handleInterestToggle(domain.id)}
-                    className="border-white/30 data-[state=checked]:bg-[#1DB954] data-[state=checked]:border-[#1DB954]"
+                    className="border-[#484847]/30 data-[state=checked]:bg-[#72fe8f] data-[state=checked]:border-[#72fe8f]"
                   />
                   <div>
-                    <p className="font-medium text-white">{domain.label}</p>
-                    <p className="text-sm text-gray-500">{domain.description}</p>
+                    <p className="font-headline font-medium text-white">{domain.label}</p>
+                    <p className="text-sm text-[#adaaaa]">{domain.description}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -662,10 +662,10 @@ export default function OnboardingPage() {
           <Button
             onClick={handleComplete}
             disabled={loading}
-            className="w-full h-14 text-lg bg-[#1DB954] hover:bg-[#1ed760] text-black font-semibold"
+            className="w-full h-14 text-lg bg-gradient-to-br from-[#72fe8f] to-[#1cb853] text-[#005f26] font-bold hover:scale-105 active:scale-95 transition-all rounded-full"
           >
             {loading ? '保存中...' : '开始学习'}
-            <ArrowRight className="w-5 h-5 ml-2" />
+            <span className="material-symbols-outlined ml-2">arrow_forward</span>
           </Button>
         </div>
       </div>
@@ -674,8 +674,8 @@ export default function OnboardingPage() {
 
   // Loading state
   return (
-    <div className="min-h-screen bg-[#121212] flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1DB954]" />
+    <div className="min-h-screen bg-[#0e0e0e] flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#72fe8f]" />
     </div>
   )
 }

@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense, useRef, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Music, ArrowLeft, Volume2, BookOpen, User, LogOut, Settings, Sparkles, Play, Pause, Loader2 } from 'lucide-react'
+import { Music, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -534,48 +534,47 @@ function SongContent() {
 
   const highlightWord = (line: string, word: string) => {
     const regex = new RegExp(`\\b(${word})\\b`, 'gi')
-    return line.replace(regex, '<strong class="text-[#1DB954] border-b-2 border-[#1DB954] font-semibold">$1</strong>')
+    return line.replace(regex, '<strong class="text-[#72fe8f] border-b-2 border-[#1DB954] font-semibold">$1</strong>')
   }
 
   return (
-    <div className="min-h-screen bg-[#121212]">
-      {/* Header - Spotify style */}
-      <header className="bg-black/50 backdrop-blur-sm border-b border-white/10 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-[#0e0e0e]">
+      {/* Header */}
+      <header className="bg-black/60 backdrop-blur-xl nav-glow sticky top-0 z-10">
+        <div className="max-w-[1400px] mx-auto px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => router.back()} className="text-gray-400 hover:text-white">
-              <ArrowLeft className="w-5 h-5" />
+            <Button variant="ghost" size="icon" onClick={() => router.back()} className="text-[#adaaaa] hover:text-white rounded-full">
+              <span className="material-symbols-outlined">arrow_back</span>
             </Button>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2">
-              <Music className="w-6 h-6 text-[#1DB954]" />
+            <h1 className="font-headline text-xl font-bold text-white flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#72fe8f]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>music_note</span>
               LyricVocab
             </h1>
           </div>
           <nav className="flex items-center gap-6">
-            <Link href="/search" className="text-gray-400 hover:text-white text-sm font-medium">搜索</Link>
-            <Link href="/vocabulary" className="text-gray-400 hover:text-white flex items-center gap-1 text-sm font-medium">
-              <BookOpen className="w-4 h-4" />
+            <Link href="/search" className="text-[#adaaaa] hover:text-white text-sm font-medium">搜索</Link>
+            <Link href="/vocabulary" className="text-[#adaaaa] hover:text-white flex items-center gap-1 text-sm font-medium">
+              <span className="material-symbols-outlined text-lg">menu_book</span>
               生词本
             </Link>
             {!initializing && (
               <>
                 {user ? (
                   <div className="flex items-center gap-3">
-                    <Link href="/settings" className="text-gray-400 hover:text-white flex items-center gap-1 text-sm font-medium">
-                      <Settings className="w-4 h-4" />
+                    <Link href="/settings" className="text-[#adaaaa] hover:text-white flex items-center gap-1 text-sm font-medium">
+                      <span className="material-symbols-outlined text-lg">settings</span>
                       {user.email?.split('@')[0]}
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="text-gray-400 hover:text-white flex items-center gap-1 text-sm font-medium"
+                      className="text-[#adaaaa] hover:text-white flex items-center gap-1 text-sm font-medium"
                     >
-                      <LogOut className="w-4 h-4" />
+                      <span className="material-symbols-outlined text-lg">logout</span>
                       退出登录
                     </button>
                   </div>
                 ) : (
-                  <Link href="/login" className="text-gray-400 hover:text-white flex items-center gap-1 text-sm font-medium">
-                    <User className="w-4 h-4" />
+                  <Link href="/login" className="bg-gradient-to-br from-[#72fe8f] to-[#1cb853] text-[#005f26] px-6 py-2 rounded-full font-bold text-sm hover:scale-105 active:scale-95 transition-all">
                     登录
                   </Link>
                 )}
@@ -585,34 +584,34 @@ function SongContent() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-[1400px] mx-auto px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left: Song Info */}
           <div className="lg:col-span-1">
-            <Card className="bg-[#181818] border-white/10">
+            <Card className="bg-[#1a1a1a] border-[#484847]/10 rounded-2xl">
               <CardContent className="p-6">
-                <div className="w-48 h-48 mx-auto mb-4 bg-[#282828] rounded-lg overflow-hidden">
+                <div className="w-48 h-48 mx-auto mb-4 bg-[#262626] rounded-2xl overflow-hidden">
                   {track?.image ? (
                     <img src={track.image} alt={track.album} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <Music className="w-16 h-16 text-gray-600" />
+                      <span className="material-symbols-outlined w-16 h-16 text-[#484847]">album</span>
                     </div>
                   )}
                 </div>
-                <h2 className="text-xl font-bold text-white text-center mb-2">{track?.name || 'Loading...'}</h2>
-                <p className="text-gray-400 text-center mb-2">{track?.artist}</p>
-                <p className="text-gray-500 text-sm text-center">{track?.album}</p>
+                <h2 className="font-headline text-xl font-bold text-white text-center mb-2">{track?.name || 'Loading...'}</h2>
+                <p className="text-[#adaaaa] text-center mb-2">{track?.artist}</p>
+                <p className="text-[#484847] text-sm text-center">{track?.album}</p>
 
                 {/* Audio URL Input */}
                 <div className="mt-4">
-                  <label className="text-xs text-gray-400 mb-1 block">音频链接 (可选)</label>
+                  <label className="text-xs text-[#adaaaa] mb-1 block font-label">音频链接 (可选)</label>
                   <input
                     type="text"
                     placeholder="输入音频URL以启用歌词播放"
                     value={audioUrl || ''}
                     onChange={(e) => setAudioUrl(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#282828] border border-white/10 rounded text-white text-sm"
+                    className="w-full px-3 py-2.5 bg-[#262626] border border-[#484847]/10 rounded-xl text-white text-sm placeholder:text-[#484847]"
                   />
                 </div>
 
@@ -698,9 +697,9 @@ function SongContent() {
                               audioRef.current.currentTime = time
                             }
                           }}
-                          className="w-full h-1 bg-[#282828] rounded-lg appearance-none cursor-pointer accent-[#1DB954]"
+                          className="w-full h-1 bg-[#262626] rounded-lg appearance-none cursor-pointer accent-[#72fe8f]"
                         />
-                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <div className="flex justify-between text-xs text-[#484847] mt-1">
                           <span>{Math.floor((youtubeId ? youtubeCurrentTime : currentTime) / 60)}:{Math.floor((youtubeId ? youtubeCurrentTime : currentTime) % 60).toString().padStart(2, '0')}</span>
                           <span>{Math.floor((youtubePlayer ? youtubePlayer.getDuration?.() || 0 : duration) / 60)}:{Math.floor((youtubePlayer ? youtubePlayer.getDuration?.() || 0 : duration) % 60).toString().padStart(2, '0')}</span>
                         </div>
@@ -709,7 +708,7 @@ function SongContent() {
 
                     {/* YouTube loading indicator */}
                     {youtubeLoading && (
-                      <p className="text-xs text-gray-500 mt-2 flex items-center gap-2">
+                      <p className="text-xs text-[#484847] mt-2 flex items-center gap-2">
                         <Loader2 className="w-3 h-3 animate-spin" />
                         正在加载YouTube音频...
                       </p>
@@ -720,7 +719,7 @@ function SongContent() {
                 {/* Lyrics Display with Timestamps */}
                 {lyrics && (
                   <div className="mt-4">
-                    <p className="text-xs text-gray-400 mb-2">
+                    <p className="text-xs text-[#adaaaa] mb-2">
                       {(hasTimestamps && (youtubeId || audioUrl)) ? '点击歌词行播放对应片段' : '歌词'}
                     </p>
                     <div className="max-h-48 overflow-y-auto space-y-1">
@@ -730,15 +729,15 @@ function SongContent() {
                           className={`text-xs p-2 rounded transition-colors flex items-center gap-2 ${
                             (hasTimestamps && (youtubeId || audioUrl))
                               ? currentlyPlayingLine === idx
-                                ? 'bg-[#1DB954]/30 text-[#1DB954] cursor-pointer'
-                                : 'text-gray-400 hover:bg-white/5 cursor-pointer'
-                              : 'text-gray-500'
+                                ? 'bg-[#1DB954]/30 text-[#72fe8f] cursor-pointer'
+                                : 'text-[#adaaaa] hover:bg-white/5 cursor-pointer'
+                              : 'text-[#484847]'
                           }`}
                           onClick={() => hasTimestamps && (youtubeId || audioUrl) && playLine(idx)}
                         >
                           {/* Play indicator */}
                           {hasTimestamps && (youtubeId || audioUrl) && timestamps[idx] && (
-                            <span className={`flex-shrink-0 ${currentlyPlayingLine === idx ? 'text-[#1DB954]' : 'text-gray-600'}`}>
+                            <span className={`flex-shrink-0 ${currentlyPlayingLine === idx ? 'text-[#72fe8f]' : 'text-gray-600'}`}>
                               {currentlyPlayingLine === idx ? (
                                 <div className="w-3 h-3">
                                   <span className="animate-pulse">🔊</span>
@@ -760,7 +759,7 @@ function SongContent() {
 
           {/* Right: Words */}
           <div className="lg:col-span-2 space-y-6">
-            <Card className="bg-[#181818] border-white/10">
+            <Card className="bg-[#1a1a1a] border-[#484847]/10">
               <CardHeader>
                 <CardTitle className="text-white mb-4">提取单词</CardTitle>
 
@@ -768,12 +767,12 @@ function SongContent() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Level Selector */}
                   <div>
-                    <label className="text-xs text-gray-400 mb-1 block">词汇等级</label>
+                    <label className="text-xs text-[#adaaaa] mb-1 block">词汇等级</label>
                     <Select value={level} onValueChange={(value) => value && setLevel(value)}>
-                      <SelectTrigger className="w-full bg-[#282828] border-white/10 text-white">
+                      <SelectTrigger className="w-full bg-[#262626] border-[#484847]/10 text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#282828] border-white/10">
+                      <SelectContent className="bg-[#262626] border-[#484847]/10">
                         <SelectItem value="cet4" className="text-white">CET-4 / 四级</SelectItem>
                         <SelectItem value="cet6" className="text-white">CET-6 / 六级</SelectItem>
                         <SelectItem value="kaoyan" className="text-white">考研</SelectItem>
@@ -788,7 +787,7 @@ function SongContent() {
 
                   {/* Difficulty Slider */}
                   <div>
-                    <label className="text-xs text-gray-400 mb-1 block">
+                    <label className="text-xs text-[#adaaaa] mb-1 block">
                       难度: {
                         difficultySlider === 1 ? '入门' :
                         difficultySlider === 2 ? '基础' :
@@ -802,9 +801,9 @@ function SongContent() {
                       max="5"
                       value={difficultySlider}
                       onChange={(e) => setDifficultySlider(parseInt(e.target.value))}
-                      className="w-full h-2 bg-[#282828] rounded-lg appearance-none cursor-pointer accent-[#1DB954]"
+                      className="w-full h-2 bg-[#282828] rounded-lg appearance-none cursor-pointer accent-[#72fe8f]"
                     />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <div className="flex justify-between text-xs text-[#484847] mt-1">
                       <span>入门</span>
                       <span>基础</span>
                       <span>中级</span>
@@ -819,7 +818,7 @@ function SongContent() {
                   onClick={extractWords}
                   disabled={extracting}
                   variant="outline"
-                  className="w-full mb-4 border-[#1DB954] text-[#1DB954] hover:bg-[#1DB954]/10 font-semibold"
+                  className="w-full mb-4 border-[#1DB954] text-[#72fe8f] hover:bg-[#1DB954]/10 font-semibold"
                 >
                   {extracting ? '提取中...' : lyrics ? '重新提取' : '提取单词'}
                 </Button>
@@ -830,7 +829,7 @@ function SongContent() {
                       <Button variant="outline" size="sm" onClick={selectAll} className="border-white/20 text-white hover:bg-white/10">
                         {selectedWords.size === words.length ? '取消全选' : '全选'}
                       </Button>
-                      <span className="text-sm text-gray-400">
+                      <span className="text-sm text-[#adaaaa]">
                         已选择 {selectedWords.size}/{words.length}
                       </span>
                     </div>
@@ -839,7 +838,7 @@ function SongContent() {
                       {words.map((item, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center gap-3 p-2.5 bg-[#282828] rounded-lg hover:bg-[#333] transition-colors min-h-[72px]"
+                          className="flex items-center gap-3 p-2.5 bg-[#282828] rounded-lg hover:bg-[#2c2c2c] transition-colors min-h-[72px]"
                         >
                           <Checkbox
                             checked={selectedWords.has(item.word)}
@@ -864,7 +863,7 @@ function SongContent() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-5 w-5 text-gray-400 hover:text-[#1DB954] shrink-0"
+                                className="h-5 w-5 text-[#adaaaa] hover:text-[#72fe8f] shrink-0"
                                 onClick={() => {
                                   const utterance = new SpeechSynthesisUtterance(item.word)
                                   utterance.lang = 'en-US'
@@ -882,7 +881,7 @@ function SongContent() {
                             )}
                             {/* Example sentence */}
                             <p
-                              className="text-xs text-gray-500 mt-0.5 line-clamp-1"
+                              className="text-xs text-[#484847] mt-0.5 line-clamp-1"
                               dangerouslySetInnerHTML={{
                                 __html: highlightWord(item.fullLine, item.originalWord)
                               }}
@@ -901,13 +900,13 @@ function SongContent() {
                     </Button>
 
                     {savedMessage && (
-                      <p className="text-[#1DB954] text-center mt-2">{savedMessage}</p>
+                      <p className="text-[#72fe8f] text-center mt-2">{savedMessage}</p>
                     )}
                   </>
                 )}
 
                 {words.length === 0 && !extracting && (
-                  <p className="text-center text-gray-500 py-4">
+                  <p className="text-center text-[#484847] py-4">
                     点击"提取单词"从歌词中提取考试相关词汇
                   </p>
                 )}
@@ -915,11 +914,11 @@ function SongContent() {
             </Card>
 
             {/* Phrase Extraction Card */}
-            <Card className="bg-[#181818] border-white/10">
+            <Card className="bg-[#1a1a1a] border-[#484847]/10">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-white flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-[#1DB954]" />
+                    <Sparkles className="w-5 h-5 text-[#72fe8f]" />
                     短语/搭配提取
                   </CardTitle>
                 </div>
@@ -939,7 +938,7 @@ function SongContent() {
                       <Button variant="outline" size="sm" onClick={selectAllPhrases} className="border-white/20 text-white hover:bg-white/10">
                         {selectedPhrases.size === phrases.length ? '取消全选' : '全选'}
                       </Button>
-                      <span className="text-sm text-gray-400">
+                      <span className="text-sm text-[#adaaaa]">
                         已选择 {selectedPhrases.size}/{phrases.length}
                       </span>
                     </div>
@@ -948,7 +947,7 @@ function SongContent() {
                       {phrases.map((item, idx) => (
                         <div
                           key={idx}
-                          className="flex items-start gap-3 p-3 bg-[#282828] rounded-lg hover:bg-[#333] transition-colors"
+                          className="flex items-start gap-3 p-3 bg-[#282828] rounded-lg hover:bg-[#2c2c2c] transition-colors"
                         >
                           <Checkbox
                             checked={selectedPhrases.has(item.phrase)}
@@ -961,7 +960,7 @@ function SongContent() {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-6 w-6 text-gray-400 hover:text-[#9B59B6]"
+                                className="h-6 w-6 text-[#adaaaa] hover:text-[#9B59B6]"
                                 onClick={() => {
                                   const utterance = new SpeechSynthesisUtterance(item.phrase)
                                   utterance.lang = 'en-US'
@@ -971,7 +970,7 @@ function SongContent() {
                                 <Volume2 className="w-4 h-4" />
                               </Button>
                             </div>
-                            <p className="text-sm text-gray-400 mt-1">
+                            <p className="text-sm text-[#adaaaa] mt-1">
                               "{item.fullLine}"
                             </p>
                           </div>
@@ -982,7 +981,7 @@ function SongContent() {
                 )}
 
                 {phrases.length === 0 && !extractingPhrases && (
-                  <p className="text-center text-gray-500 py-4">
+                  <p className="text-center text-[#484847] py-4">
                     点击"提取短语"从歌词中提取常用表达和习惯用语
                   </p>
                 )}

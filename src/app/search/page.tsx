@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Search, Music, User, BookOpen, LogOut, Settings } from 'lucide-react'
+import { BookOpen, LogOut, Settings, Search, Music, User } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 interface Track {
@@ -29,8 +29,6 @@ export default function SearchPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      // Check if user completed onboarding, if not redirect
-      const userLevel = localStorage.getItem('user_vocabulary_level')
       setUser(session?.user ?? null)
       setInitializing(false)
     })
@@ -67,7 +65,7 @@ export default function SearchPage() {
         setTracks(data.tracks || [])
       }
     } catch (err) {
-      setError('Search failed, please try again')
+      setError('搜索失败，请重试')
       setTracks([])
     } finally {
       setLoading(false)
@@ -78,164 +76,277 @@ export default function SearchPage() {
     sessionStorage.setItem('currentSong', JSON.stringify(track))
   }
 
+  const handleTrendingSearch = (term: string) => {
+    setQuery(term)
+    const form = document.querySelector('form') as HTMLFormElement
+    if (form) form.dispatchEvent(new Event('submit', { bubbles: true }))
+  }
+
   return (
-    <div className="min-h-screen bg-[#121212]">
-      {/* Header - Spotify style */}
-      <header className="bg-black/50 backdrop-blur-sm border-b border-white/10 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/search" className="flex items-center gap-2 group">
-            <Music className="w-6 h-6 text-[#1DB954] group-hover:text-[#1ed760] transition-colors" />
-            <span className="text-xl font-bold text-white">LyricVocab</span>
-          </Link>
-          <nav className="flex items-center gap-6">
-            <Link href="/search" className="text-gray-400 hover:text-white text-sm font-medium transition-colors">
-              搜索
-            </Link>
-            <Link href="/vocabulary" className="text-gray-400 hover:text-white flex items-center gap-1 text-sm font-medium transition-colors">
-              <BookOpen className="w-4 h-4" />
-              生词本
-            </Link>
+    <div className="min-h-screen bg-[#0e0e0e]">
+      {/* Navigation Bar - Design System style */}
+      <nav className="fixed top-0 w-full z-50 bg-black/60 backdrop-blur-xl nav-glow">
+        <div className="flex justify-between items-center max-w-[1400px] mx-auto px-8 h-20">
+          <div className="flex items-center gap-12">
+            <a className="flex items-center gap-2 text-2xl font-extrabold text-white font-headline tracking-tight" href="/search">
+              <span className="material-symbols-outlined text-[#72fe8f] text-3xl" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>music_note</span>
+              LyricVocab
+            </a>
+            <div className="hidden md:flex items-center gap-8 text-sm font-medium">
+              <a className="text-white border-b-2 border-[#72fe8f] pb-1 hover:scale-105 transition-transform duration-200" href="/search">搜索</a>
+              <a className="text-[#adaaaa] hover:text-white transition-colors hover:scale-105 transition-transform duration-200" href="/vocabulary">词库</a>
+              <a className="text-[#adaaaa] hover:text-white transition-colors hover:scale-105 transition-transform duration-200" href="/settings">个人中心</a>
+            </div>
+          </div>
+          <div className="flex items-center gap-6">
             {!initializing && (
               <>
                 {user ? (
                   <div className="flex items-center gap-4">
-                    <Link href="/settings" className="text-gray-400 hover:text-white flex items-center gap-1 text-sm font-medium transition-colors">
+                    <Link href="/settings" className="text-[#adaaaa] hover:text-white flex items-center gap-1 text-sm font-medium transition-colors">
                       <Settings className="w-4 h-4" />
                       {user.email?.split('@')[0]}
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="text-gray-400 hover:text-white flex items-center gap-1 text-sm font-medium transition-colors"
+                      className="text-[#adaaaa] hover:text-white flex items-center gap-1 text-sm font-medium transition-colors"
                     >
                       <LogOut className="w-4 h-4" />
                       退出登录
                     </button>
                   </div>
                 ) : (
-                  <Link href="/login" className="text-gray-400 hover:text-white flex items-center gap-1 text-sm font-medium transition-colors">
-                    <User className="w-4 h-4" />
+                  <Link href="/login" className="bg-gradient-to-br from-[#72fe8f] to-[#1cb853] text-[#005f26] px-6 py-2 rounded-full font-bold text-sm hover:scale-105 active:scale-95 transition-all">
                     登录
                   </Link>
                 )}
               </>
             )}
-          </nav>
+          </div>
         </div>
-      </header>
+      </nav>
 
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-white mb-4">
-            通过喜欢的歌曲学习词汇
-          </h2>
-          <p className="text-gray-400 text-lg">
-            搜索英文歌曲，从歌词中提取考试相关词汇
-          </p>
-        </div>
+      <main className="relative pt-20">
+        {/* Hero Section */}
+        <section className="relative min-h-[700px] flex flex-col items-center justify-center px-6 overflow-hidden">
+          {/* Background Aesthetic Elements */}
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#72fe8f]/10 blur-[120px] rounded-full" />
+          <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#006d42]/10 blur-[150px] rounded-full" />
 
-        {/* Search Form */}
-        <form onSubmit={handleSearch} className="flex gap-3 mb-8">
-          <Input
-            type="text"
-            placeholder="搜索歌曲或艺术家..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="flex-1 h-12 text-lg bg-[#181818] border-white/10 text-white placeholder:text-gray-500 focus:border-[#1DB954] focus:ring-[#1DB954]"
-          />
-          <Button
-            type="submit"
-            size="lg"
-            disabled={loading}
-            className="px-8 bg-[#1DB954] hover:bg-[#1ed760] text-black font-semibold"
-          >
-            {loading ? '搜索中...' : (
-              <>
-                <Search className="w-5 h-5 mr-2" />
-                搜索
-              </>
-            )}
-          </Button>
-        </form>
+          <div className="max-w-[1400px] w-full flex flex-col items-center text-center z-10">
+            {/* Label */}
+            <span className="font-label text-[#72fe8f] tracking-[0.2em] text-xs font-extrabold mb-6 block uppercase">原声学习环境</span>
 
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-lg mb-8 text-center">
-            {error}
-          </div>
-        )}
+            {/* Hero Heading */}
+            <h1 className="font-headline text-5xl md:text-7xl lg:text-8xl font-black hero-gradient-text tracking-tighter leading-[0.9] mb-12 max-w-4xl">
+              通过音乐的旋律学习英语
+            </h1>
 
-        {/* Results */}
-        {searched && !loading && tracks.length === 0 && !error && (
-          <div className="text-center text-gray-500 py-8">
-            未找到歌曲，请尝试其他关键词
-          </div>
-        )}
+            {/* Prominent Search Bar */}
+            <div className="w-full max-w-2xl group relative mb-8">
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#72fe8f]/20 to-[#88ebff]/20 rounded-full blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
+              <form onSubmit={handleSearch} className="relative flex items-center bg-[#262626]/80 backdrop-blur-md rounded-full px-8 py-5 border border-[#484847]/10 shadow-2xl">
+                <span className="material-symbols-outlined text-[#adaaaa] mr-4" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24" }}>search</span>
+                <input
+                  className="bg-transparent border-none focus:ring-0 w-full text-xl text-white placeholder:text-[#adaaaa]/50 font-label"
+                  placeholder="搜索歌曲、艺人或歌词..."
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+                <button type="submit" className="bg-[#72fe8f] text-[#005f26] h-12 w-12 rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition-all flex-shrink-0">
+                  <span className="material-symbols-outlined font-bold" style={{ fontVariationSettings: "'FILL' 0, 'wght' 700, 'GRAD' 0, 'opsz' 24" }}>arrow_forward</span>
+                </button>
+              </form>
+            </div>
 
-        {tracks.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {tracks.map((track) => (
-              <Link
-                key={track.id}
-                href={`/song/${track.id}`}
-                onClick={() => handleSongClick(track)}
-              >
-                <Card className="bg-[#181818] border-white/10 hover:bg-[#282828] hover:border-white/20 transition-all group cursor-pointer">
-                  <CardContent className="p-4 flex items-center gap-4">
-                    <div className="w-20 h-20 bg-[#282828] rounded-md overflow-hidden flex-shrink-0 relative">
-                      {track.image ? (
-                        <img
-                          src={track.image}
-                          alt={track.album}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Music className="w-8 h-8 text-gray-600" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-white truncate group-hover:text-[#1DB954] transition-colors">
-                        {track.name}
-                      </h3>
-                      <p className="text-gray-400 text-sm truncate">
-                        {track.artist}
-                      </p>
-                      <p className="text-gray-500 text-xs truncate">
-                        {track.album}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        )}
-
-        {/* Quick Links */}
-        {!searched && tracks.length === 0 && (
-          <div className="mt-12">
-            <h3 className="text-white font-semibold mb-4">热门搜索</h3>
-            <div className="flex flex-wrap gap-2">
-              {['Taylor Swift', 'Ed Sheeran', 'Billie Eilish', 'The Weeknd', 'Coldplay'].map((term) => (
+            {/* Trending Search Tags */}
+            <div className="flex flex-wrap justify-center gap-3">
+              <span className="text-[#adaaaa] font-label text-xs font-bold uppercase tracking-widest mr-2 self-center">热门搜索：</span>
+              {['Taylor Swift', 'Coldplay', 'Ed Sheeran', 'The Weeknd', 'Billie Eilish'].map((term) => (
                 <button
                   key={term}
-                  onClick={() => {
-                    setQuery(term)
-                    // Trigger search
-                    const form = document.querySelector('form')
-                    if (form) form.dispatchEvent(new Event('submit', { bubbles: true }))
-                  }}
-                  className="px-4 py-2 bg-[#181818] border border-white/10 rounded-full text-gray-300 hover:bg-[#282828] hover:border-white/20 transition-all text-sm"
+                  onClick={() => handleTrendingSearch(term)}
+                  className="px-5 py-2 rounded-full bg-[#1a1a1a] border border-[#484847]/10 text-[#adaaaa] text-sm font-semibold hover:bg-[#2c2c2c] hover:text-[#72fe8f] hover:scale-105 transition-all duration-300"
                 >
-                  {term}
+                  #{term}
                 </button>
               ))}
             </div>
           </div>
+        </section>
+
+        {/* Error Message */}
+        {error && (
+          <div className="max-w-[1400px] mx-auto px-8 mb-4">
+            <div className="bg-[#b92902]/10 border border-[#b92902]/20 text-[#ff7351] p-4 rounded-2xl text-center">
+              {error}
+            </div>
+          </div>
+        )}
+
+        {/* Search Results */}
+        {searched && !loading && tracks.length === 0 && !error && (
+          <div className="max-w-[1400px] mx-auto px-8 pb-8">
+            <div className="text-center text-[#adaaaa] py-8 text-lg">未找到歌曲，请尝试其他关键词</div>
+          </div>
+        )}
+
+        {/* Results Section */}
+        {tracks.length > 0 && (
+          <section className="max-w-[1400px] mx-auto px-8 pb-16">
+            <h2 className="font-headline text-2xl font-bold text-white mb-8 text-left">搜索结果</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {tracks.map((track) => (
+                <Link
+                  key={track.id}
+                  href={`/song/${track.id}`}
+                  onClick={() => handleSongClick(track)}
+                >
+                  <Card className="bg-[#1a1a1a] border-[#484847]/10 hover:bg-[#262626] hover:border-[#484847]/30 transition-all group cursor-pointer rounded-2xl overflow-hidden">
+                    <CardContent className="p-0">
+                      <div className="relative aspect-square rounded-t-2xl overflow-hidden">
+                        {track.image ? (
+                          <img
+                            src={track.image}
+                            alt={track.album}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-[#262626]">
+                            <Music className="w-12 h-12 text-[#484847]" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="material-symbols-outlined text-white text-5xl" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>play_circle</span>
+                        </div>
+                      </div>
+                      <div className="p-5">
+                        <h3 className="font-bold text-white truncate text-lg mb-1 group-hover:text-[#72fe8f] transition-colors">{track.name}</h3>
+                        <p className="text-[#adaaaa] text-sm truncate mb-1">{track.artist}</p>
+                        <p className="text-[#484847] text-xs truncate">{track.album}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Quick Links - when not searched */}
+        {!searched && tracks.length === 0 && (
+          <section className="max-w-[1400px] mx-auto px-8 pb-32">
+            {/* Featured Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+              {/* Large Feature Card */}
+              <div className="md:col-span-2 relative group overflow-hidden rounded-2xl aspect-[16/9] md:aspect-auto bg-[#1a1a1a]">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#72fe8f]/20 via-transparent to-[#88ebff]/10" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0e0e0e] via-transparent to-transparent" />
+                <div className="absolute bottom-0 left-0 p-8 md:p-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="bg-[#72fe8f] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter text-[#005f26]">精选</span>
+                  </div>
+                  <h2 className="font-headline text-3xl md:text-4xl font-extrabold text-white mb-4">跟随 Adele 掌握词汇</h2>
+                  <p className="text-[#adaaaa] max-w-md mb-6">探索《25》中丰富的隐喻和情感深度，扩展您的高级英语词汇。</p>
+                  <button onClick={() => handleTrendingSearch('Adele')} className="flex items-center gap-2 font-bold text-[#72fe8f] group-hover:translate-x-2 transition-transform">
+                    开始学习 <span className="material-symbols-outlined">trending_flat</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Secondary Cards Stack */}
+              <div className="flex flex-col gap-6">
+                <div className="bg-[#1a1a1a] p-8 rounded-2xl flex flex-col justify-between h-full hover:bg-[#262626] transition-colors group">
+                  <div>
+                    <span className="material-symbols-outlined text-[#72fe8f] text-4xl mb-4 block" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>auto_awesome</span>
+                    <h3 className="font-headline text-xl font-bold text-white mb-2">智能歌词 AI</h3>
+                    <p className="text-[#adaaaa] text-sm leading-relaxed">即时翻译并解析最新热门金曲中的成语和俚语。</p>
+                  </div>
+                  <div className="mt-8 flex justify-end">
+                    <span className="material-symbols-outlined text-[#adaaaa] group-hover:text-white transition-colors">north_east</span>
+                  </div>
+                </div>
+                <div className="bg-[#72fe8f]/5 border border-[#72fe8f]/10 p-8 rounded-2xl flex flex-col justify-between h-full hover:bg-[#72fe8f]/10 transition-colors group">
+                  <div>
+                    <span className="material-symbols-outlined text-[#72fe8f] text-4xl mb-4 block" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>speed</span>
+                    <h3 className="font-headline text-xl font-bold text-white mb-2">每日韵律挑战</h3>
+                    <p className="text-[#adaaaa] text-sm leading-relaxed">加入 4,200 名学习者，参与今日快节奏的词汇节拍匹配。</p>
+                  </div>
+                  <div className="mt-8 flex justify-end">
+                    <span className="material-symbols-outlined text-[#72fe8f] group-hover:scale-125 transition-transform cursor-pointer">play_circle</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Vocabulary Lists Grid */}
+            <div className="mb-8">
+              <h3 className="font-headline text-2xl font-bold text-white mb-8">最新词汇表</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                {[
+                  { name: '合成器流行英语', count: '24 个新短语', color: 'from-pink-500/20 to-lime-500/20' },
+                  { name: '典雅爵士词汇', count: '18 个高级习语', color: 'from-gray-500/20 to-purple-500/20' },
+                  { name: '街头俚语 101', count: '42 个常用词汇', color: 'from-blue-500/20 to-green-500/20' },
+                  { name: '民谣与叙事', count: '30 组隐喻表达', color: 'from-amber-500/20 to-orange-500/20' },
+                  { name: '古典诗词', count: '15 个罕见形容词', color: 'from-rose-500/20 to-pink-500/20' },
+                ].map((item, idx) => (
+                  <div key={idx} className="group cursor-pointer">
+                    <div className={`relative aspect-square rounded-2xl overflow-hidden mb-4 shadow-xl bg-gradient-to-br ${item.color} group-hover:scale-105 transition-transform duration-500 flex items-center justify-center`}>
+                      <span className="material-symbols-outlined text-white/50 text-5xl" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24" }}>
+                        {['album', 'queue_music', 'graphic_eq', 'waves', 'music_note'][idx]}
+                      </span>
+                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="material-symbols-outlined text-white text-4xl" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>play_circle</span>
+                      </div>
+                    </div>
+                    <h4 className="font-bold text-sm text-white truncate">{item.name}</h4>
+                    <p className="text-[#adaaaa] text-xs">{item.count}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="bg-[#0e0e0e] border-t border-[#262626] py-20 px-8">
+        <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+          <div className="col-span-1 md:col-span-1">
+            <a className="flex items-center gap-2 text-2xl font-extrabold text-white font-headline tracking-tight mb-6" href="/search">
+              <span className="material-symbols-outlined text-[#72fe8f] text-3xl" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>music_note</span>
+              LyricVocab
+            </a>
+            <p className="text-[#adaaaa] text-sm leading-relaxed max-w-xs">
+              通过声音沉浸和歌词分析的力量，构建语言学习的未来。
+            </p>
+          </div>
+          <div>
+            <h5 className="font-headline font-bold mb-6 text-white">平台</h5>
+            <ul className="space-y-4 text-sm text-[#adaaaa]">
+              <li><a className="hover:text-[#72fe8f] transition-colors" href="/search">浏览艺人</a></li>
+              <li><a className="hover:text-[#72fe8f] transition-colors" href="/vocabulary">词汇卡片</a></li>
+              <li><a className="hover:text-[#72fe8f] transition-colors" href="/settings">学习设置</a></li>
+            </ul>
+          </div>
+          <div>
+            <h5 className="font-headline font-bold mb-6 text-white">关于</h5>
+            <ul className="space-y-4 text-sm text-[#adaaaa]">
+              <li><a className="hover:text-[#72fe8f] transition-colors" href="#">关于我们</a></li>
+              <li><a className="hover:text-[#72fe8f] transition-colors" href="#">联系我们</a></li>
+            </ul>
+          </div>
+          <div>
+            <h5 className="font-headline font-bold mb-6 text-white">加入社区</h5>
+            <div className="flex gap-4">
+              <a href="#" className="w-10 h-10 rounded-full bg-[#1a1a1a] flex items-center justify-center text-[#adaaaa] hover:text-[#72fe8f] hover:bg-[#262626] transition-all">
+                <span className="material-symbols-outlined text-lg">share</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

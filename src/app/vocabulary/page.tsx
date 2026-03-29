@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Music, ArrowLeft, Volume2, Trash2, BookOpen, LogOut, FlipHorizontal, Search } from 'lucide-react'
+import { Music, Trash2, BookOpen, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -117,10 +117,10 @@ export default function VocabularyPage() {
 
   if (loading || initializing) {
     return (
-      <div className="min-h-screen bg-[#121212] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0e0e0e] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1DB954] mx-auto mb-4" />
-          <p className="text-gray-400">加载中...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#72fe8f] mx-auto mb-4" />
+          <p className="text-[#adaaaa]">加载中...</p>
         </div>
       </div>
     )
@@ -128,14 +128,14 @@ export default function VocabularyPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#121212] flex items-center justify-center p-4">
-        <Card className="max-w-md w-full bg-[#181818] border-white/10">
+      <div className="min-h-screen bg-[#0e0e0e] flex items-center justify-center p-4">
+        <Card className="max-w-md w-full bg-[#1a1a1a] border-[#484847]/10 rounded-2xl">
           <CardContent className="p-8 text-center">
-            <BookOpen className="w-16 h-16 mx-auto mb-4 text-[#1DB954]" />
-            <h2 className="text-xl font-bold text-white mb-2">请先登录</h2>
-            <p className="text-gray-400 mb-6">登录后查看您的个人生词本</p>
+            <span className="material-symbols-outlined w-16 h-16 mx-auto mb-4 text-[#72fe8f] block" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>auto_stories</span>
+            <h2 className="font-headline text-xl font-bold text-white mb-2">请先登录</h2>
+            <p className="text-[#adaaaa] mb-6">登录后查看您的个人生词本</p>
             <Link href="/login">
-              <Button className="w-full bg-[#1DB954] hover:bg-[#1ed760] text-black font-semibold">
+              <Button className="w-full bg-gradient-to-br from-[#72fe8f] to-[#1cb853] text-[#005f26] font-bold hover:scale-105 active:scale-95 transition-all rounded-full">
                 去登录
               </Button>
             </Link>
@@ -146,71 +146,71 @@ export default function VocabularyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#121212]">
+    <div className="min-h-screen bg-[#0e0e0e]">
       {/* Header */}
-      <header className="bg-black/50 backdrop-blur-sm border-b border-white/10 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="bg-black/60 backdrop-blur-xl nav-glow sticky top-0 z-10">
+        <div className="max-w-[1400px] mx-auto px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/search" className="text-gray-400 hover:text-white transition-colors">
-              <ArrowLeft className="w-5 h-5" />
+            <Link href="/search" className="text-[#adaaaa] hover:text-white transition-colors">
+              <span className="material-symbols-outlined">arrow_back</span>
             </Link>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2">
-              <BookOpen className="w-6 h-6 text-[#1DB954]" />
+            <h1 className="font-headline text-xl font-bold text-white flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#72fe8f]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>menu_book</span>
               我的生词本
             </h1>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-gray-400 text-sm">{user.email}</span>
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="text-gray-400 hover:text-white">
-              <LogOut className="w-4 h-4" />
+            <span className="text-[#adaaaa] text-sm">{user.email}</span>
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="text-[#adaaaa] hover:text-white rounded-xl">
+              <span className="material-symbols-outlined">logout</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-[1400px] mx-auto px-8 py-8">
         {words.length === 0 ? (
           <div className="text-center py-16">
-            <BookOpen className="w-16 h-16 mx-auto mb-4 text-gray-700" />
-            <h2 className="text-xl font-semibold text-white mb-2">生词本为空</h2>
-            <p className="text-gray-500 mb-6">搜索歌曲并添加单词到您的生词本</p>
+            <span className="material-symbols-outlined w-16 h-16 mx-auto mb-4 text-[#484847] block" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24" }}>library_books</span>
+            <h2 className="font-headline text-xl font-semibold text-white mb-2">生词本为空</h2>
+            <p className="text-[#484847] mb-6">搜索歌曲并添加单词到您的生词本</p>
             <Link href="/search">
-              <Button className="bg-[#1DB954] hover:bg-[#1ed760] text-black font-semibold">
-                <Search className="w-4 h-4 mr-2" />
+              <Button className="bg-gradient-to-br from-[#72fe8f] to-[#1cb853] text-[#005f26] font-bold hover:scale-105 active:scale-95 transition-all rounded-full">
+                <span className="material-symbols-outlined mr-2">search</span>
                 搜索歌曲
               </Button>
             </Link>
           </div>
         ) : (
           <Tabs defaultValue="list" className="w-full">
-            <TabsList className="w-full mb-6 bg-[#181818] border border-white/10">
-              <TabsTrigger value="list" className="flex-1 data-[state=active]:bg-[#1DB954] data-[state=active]:text-black">单词列表</TabsTrigger>
-              <TabsTrigger value="review" className="flex-1 data-[state=active]:bg-[#1DB954] data-[state=active]:text-black">复习模式</TabsTrigger>
+            <TabsList className="w-full mb-6 bg-[#1a1a1a] border border-[#484847]/10 rounded-xl p-1">
+              <TabsTrigger value="list" className="flex-1 data-[state=active]:bg-[#72fe8f] data-[state=active]:text-[#005f26] data-[state=active]:rounded-lg font-semibold text-[#adaaaa]">单词列表</TabsTrigger>
+              <TabsTrigger value="review" className="flex-1 data-[state=active]:bg-[#72fe8f] data-[state=active]:text-[#005f26] data-[state=active]:rounded-lg font-semibold text-[#adaaaa]">复习模式</TabsTrigger>
             </TabsList>
 
             <TabsContent value="list">
               <div className="space-y-3">
                 {words.map((word) => (
-                  <Card key={word.id} className="bg-[#181818] border-white/10 hover:bg-[#282828] transition-colors">
-                    <CardContent className="p-4">
+                  <Card key={word.id} className="bg-[#1a1a1a] border-[#484847]/10 hover:bg-[#262626] transition-colors rounded-2xl">
+                    <CardContent className="p-5">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xl font-bold text-white">{word.word}</span>
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="font-headline text-xl font-bold text-white">{word.word}</span>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-gray-400 hover:text-[#1DB954]"
+                              className="h-8 w-8 text-[#adaaaa] hover:text-[#72fe8f] rounded-full"
                               onClick={() => speak(word.word)}
                             >
-                              <Volume2 className="w-4 h-4" />
+                              <span className="material-symbols-outlined text-lg">volume_up</span>
                             </Button>
                           </div>
-                          <p className="text-sm text-gray-400 mb-2">
-                            <Music className="w-3 h-3 inline mr-1" />
+                          <p className="text-sm text-[#adaaaa] mb-2 flex items-center gap-1">
+                            <span className="material-symbols-outlined text-xs">music_note</span>
                             {word.song_name} - {word.artist}
                           </p>
-                          <p className="text-sm text-gray-500 italic">
+                          <p className="text-sm text-[#484847] italic">
                             "{word.lyric_context}"
                           </p>
                         </div>
@@ -218,9 +218,9 @@ export default function VocabularyPage() {
                           variant="ghost"
                           size="icon"
                           onClick={() => deleteWord(word.id)}
-                          className="text-gray-500 hover:text-red-400"
+                          className="text-[#484847] hover:text-[#ff7351] rounded-full"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <span className="material-symbols-outlined">delete</span>
                         </Button>
                       </div>
                     </CardContent>
@@ -238,9 +238,7 @@ export default function VocabularyPage() {
                     onClick={() => toggleCard(word.id)}
                   >
                     <div
-                      className={`relative w-full h-full transition-all duration-300 ${
-                        flippedCards.has(word.id) ? 'rotate-y-180' : ''
-                      }`}
+                      className={`relative w-full h-full transition-all duration-300`}
                       style={{
                         transformStyle: 'preserve-3d',
                         transform: flippedCards.has(word.id) ? 'rotateY(180deg)' : 'rotateY(0deg)',
@@ -248,37 +246,37 @@ export default function VocabularyPage() {
                     >
                       {/* Front */}
                       <div
-                        className="absolute inset-0 bg-[#181818] border border-white/10 rounded-lg p-4 flex flex-col items-center justify-center"
+                        className="absolute inset-0 bg-[#1a1a1a] border border-[#484847]/10 rounded-2xl p-4 flex flex-col items-center justify-center"
                         style={{ backfaceVisibility: 'hidden' }}
                       >
-                        <span className="text-2xl font-bold text-white mb-2">{word.word}</span>
+                        <span className="font-headline text-2xl font-bold text-white mb-2">{word.word}</span>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-gray-400 hover:text-[#1DB954]"
+                          className="text-[#adaaaa] hover:text-[#72fe8f] rounded-full"
                           onClick={(e) => {
                             e.stopPropagation()
                             speak(word.word)
                           }}
                         >
-                          <Volume2 className="w-5 h-5" />
+                          <span className="material-symbols-outlined">volume_up</span>
                         </Button>
-                        <FlipHorizontal className="w-4 h-4 text-gray-600 mt-3" />
+                        <span className="material-symbols-outlined w-4 h-4 text-[#484847] mt-3">flip</span>
                       </div>
 
                       {/* Back */}
                       <div
-                        className="absolute inset-0 bg-[#1DB954]/10 border border-[#1DB954]/30 rounded-lg p-4 flex flex-col items-center justify-center"
+                        className="absolute inset-0 bg-[#72fe8f]/10 border border-[#72fe8f]/30 rounded-2xl p-4 flex flex-col items-center justify-center"
                         style={{
                           transform: 'rotateY(180deg)',
                           backfaceVisibility: 'hidden'
                         }}
                       >
-                        <p className="text-gray-300 text-sm text-center mb-2">
-                          <Music className="w-3 h-3 inline mr-1" />
+                        <p className="text-[#adaaaa] text-sm text-center mb-2 flex items-center gap-1">
+                          <span className="material-symbols-outlined text-xs">music_note</span>
                           {word.song_name}
                         </p>
-                        <p className="text-gray-500 text-xs text-center italic">
+                        <p className="text-[#484847] text-xs text-center italic">
                           "{word.lyric_context}"
                         </p>
                       </div>
@@ -292,4 +290,5 @@ export default function VocabularyPage() {
       </main>
     </div>
   )
+}
 }

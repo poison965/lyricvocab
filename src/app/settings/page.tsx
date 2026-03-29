@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Settings as SettingsIcon, ArrowLeft, BookOpen, User, LogOut, Check } from 'lucide-react'
+import { Settings as SettingsIcon, LogOut, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -103,48 +103,42 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#121212] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1DB954]" />
+      <div className="min-h-screen bg-[#0e0e0e] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#72fe8f]" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#121212]">
+    <div className="min-h-screen bg-[#0e0e0e]">
       {/* Header */}
-      <header className="bg-black/50 backdrop-blur-sm border-b border-white/10 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="bg-black/60 backdrop-blur-xl nav-glow sticky top-0 z-10">
+        <div className="max-w-[1400px] mx-auto px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/search">
-              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
-                <ArrowLeft className="w-5 h-5" />
+              <Button variant="ghost" size="icon" className="text-[#adaaaa] hover:text-white rounded-full">
+                <span className="material-symbols-outlined">arrow_back</span>
               </Button>
             </Link>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2">
-              <SettingsIcon className="w-6 h-6 text-[#1DB954]" />
+            <h1 className="font-headline text-xl font-bold text-white flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#72fe8f]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>settings</span>
               设置
             </h1>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+      <main className="max-w-[1400px] mx-auto px-8 py-8 space-y-6">
         {/* User Info Card */}
-        <Card className="bg-[#181818] border-white/10">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-white">
-              <User className="w-5 h-5" />
-              个人资料
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Card className="bg-[#1a1a1a] border-[#484847]/10 rounded-2xl">
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-white">{user?.email}</p>
-                <p className="text-sm text-gray-500">已验证邮箱</p>
+                <p className="font-headline font-medium text-white">{user?.email}</p>
+                <p className="text-sm text-[#adaaaa]">已验证邮箱</p>
               </div>
-              <Button variant="outline" onClick={handleLogout} className="border-white/20 text-white hover:bg-white/10">
-                <LogOut className="w-4 h-4 mr-2" />
+              <Button variant="outline" onClick={handleLogout} className="border-[#484847]/30 text-[#adaaaa] hover:bg-[#262626] hover:text-white rounded-xl">
+                <span className="material-symbols-outlined mr-2">logout</span>
                 退出登录
               </Button>
             </div>
@@ -152,27 +146,27 @@ export default function SettingsPage() {
         </Card>
 
         {/* Vocabulary Level */}
-        <Card className="bg-[#181818] border-white/10">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-white">
-              <BookOpen className="w-5 h-5" />
+        <Card className="bg-[#1a1a1a] border-[#484847]/10 rounded-2xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-white font-headline">
+              <span className="material-symbols-outlined text-[#72fe8f]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>menu_book</span>
               词汇等级
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-[#adaaaa]">
               选择您的英语水平，系统将自动过滤您已掌握的简单词汇
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Select value={userLevel} onValueChange={(value) => value && setUserLevel(value)}>
-              <SelectTrigger className="w-full bg-[#282828] border-white/10 text-white">
+              <SelectTrigger className="w-full bg-[#262626] border-[#484847]/10 text-white rounded-xl">
                 <SelectValue placeholder="选择词汇等级" />
               </SelectTrigger>
-              <SelectContent className="bg-[#282828] border-white/10">
+              <SelectContent className="bg-[#262626] border-[#484847]/10 rounded-xl">
                 {vocabularyLevels.map((level) => (
-                  <SelectItem key={level.id} value={level.id} className="text-white">
+                  <SelectItem key={level.id} value={level.id} className="text-white rounded-lg">
                     <div>
                       <p className="font-medium">{level.name}</p>
-                      <p className="text-xs text-gray-400">{level.description}</p>
+                      <p className="text-xs text-[#adaaaa]">{level.description}</p>
                     </div>
                   </SelectItem>
                 ))}
@@ -182,27 +176,27 @@ export default function SettingsPage() {
         </Card>
 
         {/* Interest Area */}
-        <Card className="bg-[#181818] border-white/10">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-white">
-              <SettingsIcon className="w-5 h-5" />
+        <Card className="bg-[#1a1a1a] border-[#484847]/10 rounded-2xl">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-white font-headline">
+              <span className="material-symbols-outlined text-[#72fe8f]" style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>tune</span>
               兴趣领域
             </CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-[#adaaaa]">
               选择您的兴趣领域，优先展示相关词汇
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Select value={userInterest} onValueChange={(value) => value && setUserInterest(value)}>
-              <SelectTrigger className="w-full bg-[#282828] border-white/10 text-white">
+              <SelectTrigger className="w-full bg-[#262626] border-[#484847]/10 text-white rounded-xl">
                 <SelectValue placeholder="选择兴趣领域" />
               </SelectTrigger>
-              <SelectContent className="bg-[#282828] border-white/10">
+              <SelectContent className="bg-[#262626] border-[#484847]/10 rounded-xl">
                 {interestAreas.map((area) => (
-                  <SelectItem key={area.id} value={area.id} className="text-white">
+                  <SelectItem key={area.id} value={area.id} className="text-white rounded-lg">
                     <div className="text-left">
                       <p className="font-medium">{area.name}</p>
-                      <p className="text-xs text-gray-400">{area.description}</p>
+                      <p className="text-xs text-[#adaaaa]">{area.description}</p>
                     </div>
                   </SelectItem>
                 ))}
@@ -216,11 +210,11 @@ export default function SettingsPage() {
           <Button
             onClick={handleSavePreferences}
             disabled={saving}
-            className="min-w-32 bg-[#1DB954] hover:bg-[#1ed760] text-black font-semibold"
+            className="min-w-32 bg-gradient-to-br from-[#72fe8f] to-[#1cb853] text-[#005f26] font-bold hover:scale-105 active:scale-95 transition-all rounded-full"
           >
             {saving ? '保存中...' : saved ? (
               <>
-                <Check className="w-4 h-4 mr-2" />
+                <span className="material-symbols-outlined mr-2">check</span>
                 已保存
               </>
             ) : '保存设置'}
