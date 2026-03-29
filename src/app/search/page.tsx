@@ -84,6 +84,21 @@ export default function SearchPage() {
     if (form) form.dispatchEvent(new Event('submit', { bubbles: true }))
   }
 
+  const handleVocabCardClick = (term: string) => {
+    setQuery(term)
+    setSearched(true)
+    setLoading(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    fetch(`/api/spotify/search?q=${encodeURIComponent(term)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.tracks) setTracks(data.tracks)
+        else setError(data.error || '搜索失败')
+      })
+      .catch(() => setError('搜索失败，请重试'))
+      .finally(() => setLoading(false))
+  }
+
   return (
     <div className="min-h-screen bg-[#0e0e0e]">
       {/* Navigation Bar - Design System style */}
@@ -310,13 +325,17 @@ export default function SearchPage() {
               <h3 className="font-headline text-2xl font-bold text-white mb-8">最新词汇表</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
                 {[
-                  { name: '合成器流行英语', count: '24 个新短语', color: 'from-pink-500/20 to-lime-500/20' },
-                  { name: '典雅爵士词汇', count: '18 个高级习语', color: 'from-gray-500/20 to-purple-500/20' },
-                  { name: '街头俚语 101', count: '42 个常用词汇', color: 'from-blue-500/20 to-green-500/20' },
-                  { name: '民谣与叙事', count: '30 组隐喻表达', color: 'from-amber-500/20 to-orange-500/20' },
-                  { name: '古典诗词', count: '15 个罕见形容词', color: 'from-rose-500/20 to-pink-500/20' },
+                  { name: '合成器流行英语', count: '24 个新短语', color: 'from-pink-500/20 to-lime-500/20', searchTerm: 'synth-pop vocabulary' },
+                  { name: '典雅爵士词汇', count: '18 个高级习语', color: 'from-gray-500/20 to-purple-500/20', searchTerm: 'jazz vocabulary' },
+                  { name: '街头俚语 101', count: '42 个常用词汇', color: 'from-blue-500/20 to-green-500/20', searchTerm: 'slang vocabulary' },
+                  { name: '民谣与叙事', count: '30 组隐喻表达', color: 'from-amber-500/20 to-orange-500/20', searchTerm: 'folk vocabulary' },
+                  { name: '古典诗词', count: '15 个罕见形容词', color: 'from-rose-500/20 to-pink-500/20', searchTerm: 'classical poetry vocabulary' },
                 ].map((item, idx) => (
-                  <div key={idx} className="group cursor-pointer">
+                  <div
+                    key={idx}
+                    className="group cursor-pointer"
+                    onClick={() => handleVocabCardClick(item.searchTerm)}
+                  >
                     <div className={`relative aspect-square rounded-2xl overflow-hidden mb-4 shadow-xl bg-gradient-to-br ${item.color} group-hover:scale-105 transition-transform duration-500 flex items-center justify-center`}>
                       <span className="material-symbols-outlined text-white/50 text-5xl" style={{ fontVariationSettings: "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24" }}>
                         {['album', 'queue_music', 'graphic_eq', 'waves', 'music_note'][idx]}

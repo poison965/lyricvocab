@@ -95,7 +95,13 @@
   --color-inverse-primary: #006e2d;
 }
 
+/* Font variables - fallback to system fonts if Google Fonts fail */
 :root {
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-headline: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-label: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-geist-mono: ui-monospace, 'Cascadia Code', 'Segoe UI Mono', monospace;
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -131,6 +137,12 @@
 }
 
 .dark {
+  /* Font variables - fallback to system fonts if Google Fonts fail */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-headline: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-label: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-geist-mono: ui-monospace, 'Cascadia Code', 'Segoe UI Mono', monospace;
+
   --background: #0e0e0e;
   --foreground: #ffffff;
   --card: #1a1a1a;
