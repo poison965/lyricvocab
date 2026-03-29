@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { supabase } from '@/lib/supabase'
+import { useToast } from '@/components/toast'
 
 const interestAreas = [
   { id: 'general', name: '通用', description: '日常生活和工作词汇' },
@@ -36,7 +37,7 @@ export default function SettingsPage() {
   const [userLevel, setUserLevel] = useState('cet4')
   const [userInterest, setUserInterest] = useState('general')
   const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
+  const { showToast } = useToast()
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -91,14 +92,11 @@ export default function SettingsPage() {
     setSaving(true)
     localStorage.setItem('userLevel', userLevel)
     localStorage.setItem('userInterest', userInterest)
-
-    // Also update the onboarding level format
     localStorage.setItem('user_vocabulary_level', userLevel)
 
     await new Promise(resolve => setTimeout(resolve, 500))
     setSaving(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    showToast('设置已保存', 'success')
   }
 
   if (loading) {
@@ -212,12 +210,7 @@ export default function SettingsPage() {
             disabled={saving}
             className="min-w-32 bg-gradient-to-br from-[#72fe8f] to-[#1cb853] text-[#005f26] font-bold hover:scale-105 active:scale-95 transition-all rounded-full"
           >
-            {saving ? '保存中...' : saved ? (
-              <>
-                <span className="material-symbols-outlined mr-2">check</span>
-                已保存
-              </>
-            ) : '保存设置'}
+            {saving ? '保存中...' : '保存设置'}
           </Button>
         </div>
       </main>

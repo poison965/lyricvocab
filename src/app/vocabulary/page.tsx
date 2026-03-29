@@ -3,12 +3,15 @@
 import { useState, useEffect, use } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Music, Trash2, BookOpen, LogOut } from 'lucide-react'
+import { Music, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { supabase } from '@/lib/supabase'
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis'
+import { Skeleton } from '@/components/skeleton'
+import { EmptyState } from '@/components/empty-state'
+import { useToast } from '@/components/toast'
 
 interface VocabWord {
   id: string
@@ -29,6 +32,7 @@ export default function VocabularyPage() {
   const [initializing, setInitializing] = useState(true)
   const { speak } = useSpeechSynthesis()
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set())
+  const { showToast } = useToast()
 
   useEffect(() => {
     checkUser()
@@ -87,6 +91,7 @@ export default function VocabularyPage() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
+    showToast('已退出登录', 'success')
     router.push('/login')
   }
 
@@ -99,6 +104,7 @@ export default function VocabularyPage() {
 
       if (!error) {
         setWords(words.filter(w => w.id !== id))
+        showToast('已删除单词', 'success')
       }
     } catch (error) {
       console.error('Error deleting word:', error)
@@ -117,11 +123,28 @@ export default function VocabularyPage() {
 
   if (loading || initializing) {
     return (
-      <div className="min-h-screen bg-[#0e0e0e] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#72fe8f] mx-auto mb-4" />
-          <p className="text-[#adaaaa]">加载中...</p>
-        </div>
+      <div className="min-h-screen bg-[#0e0e0e]">
+        <header className="bg-black/60 backdrop-blur-xl nav-glow sticky top-0 z-10">
+          <div className="max-w-[1400px] mx-auto px-8 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Skeleton className="w-10 h-10 rounded-full" />
+              <Skeleton className="h-6 w-40" />
+            </div>
+            <Skeleton className="h-5 w-32" />
+          </div>
+        </header>
+        <main className="max-w-[1400px] mx-auto px-8 py-8 space-y-4 pb-24">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="bg-[#1a1a1a] rounded-2xl p-5 flex justify-between items-center">
+              <div className="space-y-2 flex-1">
+                <Skeleton className="h-6 w-40" />
+                <Skeleton className="h-4 w-60" />
+                <Skeleton className="h-3 w-80" />
+              </div>
+              <Skeleton className="w-8 h-8 rounded-full ml-4" />
+            </div>
+          ))}
+        </main>
       </div>
     )
   }

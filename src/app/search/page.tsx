@@ -6,8 +6,10 @@ import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { BookOpen, LogOut, Settings, Search, Music, User } from 'lucide-react'
+import { BookOpen, LogOut, Settings, Music } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { Skeleton } from '@/components/skeleton'
+import { EmptyState } from '@/components/empty-state'
 
 interface Track {
   id: string
@@ -185,15 +187,38 @@ export default function SearchPage() {
           </div>
         )}
 
-        {/* Search Results */}
+        {/* Empty State */}
         {searched && !loading && tracks.length === 0 && !error && (
-          <div className="max-w-[1400px] mx-auto px-8 pb-8">
-            <div className="text-center text-[#adaaaa] py-8 text-lg">未找到歌曲，请尝试其他关键词</div>
+          <div className="max-w-[1400px] mx-auto px-8 pb-16">
+            <EmptyState
+              icon="search_off"
+              title="未找到相关歌曲"
+              description="换个关键词试试，或者搜索其他艺人或歌曲名称"
+            />
           </div>
         )}
 
+        {/* Skeleton Loading */}
+        {loading && (
+          <section className="max-w-[1400px] mx-auto px-8 pb-16">
+            <div className="h-8 w-40 bg-[#262626] rounded-xl mb-8 animate-shimmer" />
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="bg-[#1a1a1a] rounded-2xl overflow-hidden">
+                  <Skeleton className="aspect-square rounded-t-2xl" />
+                  <div className="p-5 space-y-3">
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-3 w-1/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Results Section */}
-        {tracks.length > 0 && (
+        {!loading && tracks.length > 0 && (
           <section className="max-w-[1400px] mx-auto px-8 pb-16">
             <h2 className="font-headline text-2xl font-bold text-white mb-8 text-left">搜索结果</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

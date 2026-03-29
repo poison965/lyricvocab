@@ -10,6 +10,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import YouTube from 'react-youtube'
 import { supabase } from '@/lib/supabase'
+import { Skeleton } from '@/components/skeleton'
+import { useToast } from '@/components/toast'
 
 interface Track {
   id: string
@@ -67,7 +69,6 @@ function SongContent() {
   const [extracting, setExtracting] = useState(false)
   const [extractingPhrases, setExtractingPhrases] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [savedMessage, setSavedMessage] = useState('')
   const [user, setUser] = useState<any>(null)
   const [initializing, setInitializing] = useState(true)
 
@@ -87,6 +88,7 @@ function SongContent() {
   const [youtubeCurrentTime, setYoutubeCurrentTime] = useState(0)
   const youtubeRef = useRef<any>(null)
   const youtubeIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const { showToast } = useToast()
 
   useEffect(() => {
     const stored = sessionStorage.getItem('currentSong')
@@ -461,13 +463,11 @@ function SongContent() {
     // Check if user is logged in
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) {
-      setSavedMessage('请先登录')
-      setTimeout(() => setSavedMessage(''), 3000)
+      showToast('请先登录', 'error')
       return
     }
 
     setSaving(true)
-    setSavedMessage('')
 
     const wordsToSave = words.filter(w => selectedWords.has(w.word))
     const phrasesToSave = phrases.filter(p => selectedPhrases.has(p.phrase))
@@ -523,8 +523,7 @@ function SongContent() {
         }
       }
 
-      setSavedMessage(`已添加 ${savedCount} 项到生词本`)
-      setTimeout(() => setSavedMessage(''), 3000)
+      showToast(`已添加 ${savedCount} 项到生词本`, 'success')
     } catch (error) {
       console.error('Failed to save:', error)
     } finally {
@@ -898,10 +897,6 @@ function SongContent() {
                     >
                       {saving ? '保存中...' : `添加到生词本 (单词: ${selectedWords.size}, 短语: ${selectedPhrases.size})`}
                     </Button>
-
-                    {savedMessage && (
-                      <p className="text-[#72fe8f] text-center mt-2">{savedMessage}</p>
-                    )}
                   </>
                 )}
 
@@ -996,7 +991,39 @@ function SongContent() {
 
 export default function SongPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#121212] flex items-center justify-center text-white">Loading...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0e0e0e]">
+        <header className="bg-black/60 backdrop-blur-xl sticky top-0 z-10">
+          <div className="max-w-[1400px] mx-auto px-8 py-4 flex items-center gap-4">
+            <Skeleton className="w-10 h-10 rounded-full" />
+            <Skeleton className="h-6 w-40" />
+          </div>
+        </header>
+        <main className="max-w-[1400px] mx-auto px-8 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-1">
+              <div className="bg-[#1a1a1a] rounded-2xl p-6">
+                <Skeleton className="w-48 h-48 rounded-2xl mx-auto mb-4" />
+                <Skeleton className="h-6 w-40 mx-auto mb-2" />
+                <Skeleton className="h-4 w-32 mx-auto mb-2" />
+                <Skeleton className="h-3 w-48 mx-auto" />
+              </div>
+            </div>
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-[#1a1a1a] rounded-2xl p-6">
+                <Skeleton className="h-6 w-32 mb-4" />
+                <Skeleton className="h-10 w-full mb-4" />
+                <div className="space-y-2">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <Skeleton key={i} className="h-16 w-full rounded-lg" />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    }>
       <SongContent />
     </Suspense>
   )
