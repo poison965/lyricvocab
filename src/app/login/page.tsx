@@ -7,6 +7,8 @@ import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { useToast } from '@/components/toast'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -15,6 +17,10 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [user, setUser] = useState<any>(null)
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false)
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('')
+  const [resetLoading, setResetLoading] = useState(false)
+  const { showToast } = useToast()
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -63,6 +69,31 @@ export default function LoginPage() {
       setError('登录失败，请重试')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!forgotPasswordEmail.trim()) {
+      showToast('请输入邮箱地址', 'error')
+      return
+    }
+    setResetLoading(true)
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
+      if (error) {
+        showToast(error.message || '发送失败，请重试', 'error')
+      } else {
+        showToast('重置邮件已发送，请查收', 'success')
+        setForgotPasswordOpen(false)
+        setForgotPasswordEmail('')
+      }
+    } catch (err) {
+      showToast('发送失败，请检查网络连接', 'error')
+    } finally {
+      setResetLoading(false)
     }
   }
 
@@ -123,7 +154,17 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            <p className="text-center text-sm text-[#adaaaa] mt-6">
+            <div className="text-center mt-4">
+              <button
+                type="button"
+                onClick={() => setForgotPasswordOpen(true)}
+                className="text-sm text-[#adaaaa] hover:text-[#72fe8f] transition-colors"
+              >
+                忘记密码？
+              </button>
+            </div>
+
+            <p className="text-center text-sm text-[#adaaaa] mt-4">
               还没有账号？{' '}
               <Link href="/register" className="text-[#72fe8f] hover:underline font-semibold">
                 注册
@@ -132,6 +173,37 @@ export default function LoginPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Forgot Password Dialog */}
+      <Dialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen}>
+        <DialogContent className="bg-[#1a1a1a] border-[#484847]/10">
+          <DialogHeader>
+            <DialogTitle className="text-white font-headline text-xl font-bold">重置密码</DialogTitle>
+            <DialogDescription className="text-[#adaaaa]">
+              输入您的注册邮箱，我们将发送重置密码链接
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleForgotPassword} className="space-y-4">
+            <Input
+              type="email"
+              placeholder="your@email.com"
+              value={forgotPasswordEmail}
+              onChange={(e) => setForgotPasswordEmail(e.target.value)}
+              required
+              className="bg-[#262626] border-[#484847]/10 text-white placeholder:text-[#484847] focus-visible:border-[#72fe8f] focus-visible:ring-[#72fe8f]/20"
+            />
+            <DialogFooter>
+              <Button
+                type="submit"
+                disabled={resetLoading}
+                className="w-full bg-gradient-to-br from-[#72fe8f] to-[#1cb853] text-[#005f26] font-bold hover:scale-105 active:scale-95 transition-all rounded-full h-10"
+              >
+                {resetLoading ? '发送中...' : '发送重置邮件'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
